@@ -13,7 +13,7 @@ RUN apt install -y git make binutils-dev \
     gettext flex bison pkg-config wget curl \
     libglib2.0-dev nasm liblua5.1-0-dev libsigc++-2.0-dev \
     texinfo gcc-arm-embedded expat libexpat1-dev python2.7-dev \
-    g++ build-essential python3 python3-pip \
+    g++ gdb build-essential python3 python3-pip \
     libexpat1-dev sudo libc++-dev libc++1 \
     libiberty-dev clang-3.6 libc6-dev-i386 subversion libtool \
     pkg-config autoconf automake libusb-1.0 usbutils man less telnet vim nano
@@ -58,20 +58,29 @@ set -g @plugin 'tmux-plugins/tmux-resurrect'\n\
 set -g @resurrect-strategy-vim 'session'\n\
 " >> /home/avatar/.tmux.conf    
 
+### building keystone from its source (cf. https://github.com/avatartwo/avatar2/issues/23)
+RUN apt install -y cmake
+RUN git clone https://github.com/keystone-engine/keystone.git
+RUN cd keystone;mkdir build;cd build;../make-share.sh;make install;ldconfig;cd ../bindings/python;make install3
+
 ### Avatar2
+RUN apt install -y python3-pip python3-setuptools python3-dev cmake
 RUN git clone https://github.com/avatartwo/avatar2.git
 RUN cd avatar2 && pip3 install .
-RUN apt install -y libpixman-1-dev
 # RUN cd avatar2/targets && ./build_*.sh
-#### from targets/build_panda.sh
+
+### Avatar2 targets
 RUN echo "deb-src http://archive.ubuntu.com/ubuntu/ xenial-security main restricted" >> /etc/apt/sources.list && \
-    apt-get update && \
-    apt-get build-dep -y qemu && \
-    apt-get -y install protobuf-compiler protobuf-c-compiler \
-        libprotobuf-c0-dev libprotoc-dev libelf-dev libc++-dev && \
+    apt update && \
+    apt build-dep -y qemu
+#### from targets/build_panda.sh
+RUN apt install -y protobuf-compiler protobuf-c-compiler \
+        libprotobuf-c0-dev libprotoc-dev libelf-dev libc++-dev pkg-config && \
+    apt install -y software-properties-common && \
     add-apt-repository -y ppa:phulin/panda && \
-    apt-get update && \
-    apt-get -y install libcapstone-dev libdwarf-dev python-pycparser
+    apt update && \
+    apt install -y libcapstone-dev libdwarf-dev python-pycparser \
+        libwiretap-dev libwireshark-dev
 RUN cd avatar2/targets && cd `dirname "$BASH_SOURCE"`/src/ && \
     git submodule update --init avatar-panda
 RUN cd avatar2/targets/src && cd avatar-panda && \
@@ -79,6 +88,15 @@ RUN cd avatar2/targets/src && cd avatar-panda && \
 RUN mkdir -p avatar2/targets/build/panda/panda && \
     cd avatar2/targets/build/panda/panda && \
     ../../../src/avatar-panda/configure --disable-sdl --target-list=arm-softmmu && \
+    make -j4
+#### from targets/build_qemu.sh
+RUN cd avatar2/targets && cd `dirname "$BASH_SOURCE"`/src/ && \
+    git submodule update --init avatar-qemu
+RUN cd avatar2/targets/src && cd avatar-qemu && \
+    git submodule update --init dtc
+RUN mkdir -p avatar2/targets/build/qemu/ && \
+    cd avatar2/targets/build/qemu && \
+    ../../src/avatar-qemu/configure --disable-sdl --target-list=arm-softmmu && \
     make -j4
 
 ### Avatar2 examples
