@@ -13,7 +13,7 @@ RUN apt install -y git make binutils-dev \
     gettext flex bison pkg-config wget curl \
     libglib2.0-dev nasm liblua5.1-0-dev libsigc++-2.0-dev \
     texinfo gcc-arm-embedded expat libexpat1-dev python2.7-dev \
-    g++ build-essential python3 python3-pip \
+    g++ gdb build-essential python3 python3-pip \
     libexpat1-dev sudo libc++-dev libc++1 \
     libiberty-dev clang-3.6 libc6-dev-i386 subversion libtool \
     pkg-config autoconf automake libusb-1.0 usbutils man less telnet vim nano
