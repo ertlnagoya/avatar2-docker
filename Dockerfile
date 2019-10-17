@@ -71,7 +71,8 @@ RUN echo "deb-src http://archive.ubuntu.com/ubuntu/ xenial-security main restric
         libprotobuf-c0-dev libprotoc-dev libelf-dev libc++-dev && \
     add-apt-repository -y ppa:phulin/panda && \
     apt-get update && \
-    apt-get -y install libcapstone-dev libdwarf-dev python-pycparser
+    apt-get -y install libcapstone-dev libdwarf-dev python-pycparser \
+        libwiretap-dev libwireshark-dev
 RUN cd avatar2/targets && cd `dirname "$BASH_SOURCE"`/src/ && \
     git submodule update --init avatar-panda
 RUN cd avatar2/targets/src && cd avatar-panda && \
